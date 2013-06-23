@@ -21,6 +21,15 @@ public class Neuron {
 	private double out;
 	private boolean bias;
 
+	public Neuron(Function function, double... weights) {
+		this.weights = weights;
+		this.activateFunction = function;
+	}
+	
+	public void setWeights(double[] weights) {
+		this.weights = weights;
+	}
+	
 	public Neuron(int inputSize, Function function) {
 
 		weights = new double[inputSize];

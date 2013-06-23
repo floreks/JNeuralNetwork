@@ -75,6 +75,7 @@ public class NetworkTest {
 		return network;
 	}
 
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 
 		NeuralNetwork network = networkBuilder(3, new int[] { 1, 12, 1 },
