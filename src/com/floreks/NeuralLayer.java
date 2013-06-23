@@ -13,92 +13,97 @@ public class NeuralLayer {
 	private static final String CLASSNAME = NeuralLayer.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(CLASSNAME);
 	private List<Neuron> neurons = new ArrayList<Neuron>();
+	private NeuralLayer nextLayer;
+	private boolean bias = false;
 
-	public NeuralLayer(Integer neuronsCount, Integer inputSize,
-			Function function) {
-
-		LOGGER.debug("Creating layer - Neurons: " + neuronsCount
-				+ " Input size: " + inputSize);
-		for (int i = 0; i < neuronsCount; i++) {
-			neurons.add(0, new Neuron(inputSize, function));
-		}
-	}
-
-	public NeuralLayer(Integer neuronsCount, Integer inputSize) {
+	public NeuralLayer(int neuronsCount, int inputSize) {
 
 		for (int i = 0; i < neuronsCount; i++) {
 			neurons.add(0, new Neuron(inputSize));
 		}
 	}
 
-	public NeuralLayer() {
-
+	public void setNextLayer(NeuralLayer layer) {
+		this.nextLayer = layer;
 	}
 
-	public void setNeurons(List<Neuron> neurons) {
-		this.neurons = neurons;
-	}
-
-	public List<Neuron> getNeurons() {
-		return neurons;
+	public NeuralLayer getNextLayer() {
+		return nextLayer;
 	}
 
 	public void addNeuron(Neuron neuron) {
 		neurons.add(neuron);
 	}
 
+	public void addNeurons(List<Neuron> neurons) {
+		this.neurons.addAll(neurons);
+	}
+
 	public void setActivateFunction(Function function) {
-		for (int i = 0; i < neurons.size(); i++) {
-			neurons.get(i).setActivateFunction(function);
+		for (Neuron neuron : neurons) {
+			neuron.setActivateFunction(function);
 		}
 	}
 
-	public void setExpectedOuput(List<Double> expectedOutput) {
-
-		LOGGER.debug("Setting output");
-		for (int i = 0; i < neurons.size(); i++) {
-			neurons.get(i).setExpectedOutput(expectedOutput.get(i));
+	public void initWeights(double lowerBound, double upperBound) {
+		int i = 1;
+		for (Neuron neuron : neurons) {
+			LOGGER.debug("Neuron " + (i++));
+			neuron.initWeights(lowerBound, upperBound);
 		}
 	}
 
-	public void initLayerWeights(double minRange, double maxRange) {
-		for (int i = 0; i < neurons.size(); i++) {
-			neurons.get(i).initWeights(minRange, maxRange);
+	public void initSignals(double[] signals) {
+		for (int i = 0; i < signals.length; i++) {
+			LOGGER.debug("Neuron " + (i + 1));
+			neurons.get(i).setSignals(new double[] { signals[i] });
 		}
 	}
 
-	public void initLayerSignals(List<Double> signals) {
-		for (int i = 0; i < neurons.size(); i++) {
-			neurons.get(i).initSignals(signals);
-		}
-	}
-	
-	public void initFirstLayer(List<Double> signals) {
-		for(int i=0;i<neurons.size();i++) {
-			neurons.get(i).initSignals(Arrays.asList(new Double[] {signals.get(i)}));
+	public void setBiasEnabled(boolean bool) {
+		bias = bool;
+		for (Neuron neuron : neurons) {
+			neuron.setBiasEnabled(bool);
 		}
 	}
 
-	public void enableBias(Boolean bool) {
-		for (int i = 0; i < neurons.size(); i++) {
-			neurons.get(i).enableBias(bool);
-		}
+	public List<Neuron> getNeurons() {
+		return neurons;
 	}
 
-	public List<Double> output() {
-		List<Double> signals = new ArrayList<Double>();
+	public double[] output() {
+		double[] result = new double[neurons.size()];
 
 		for (int i = 0; i < neurons.size(); i++) {
-			LOGGER.info("Neuron nr: " + (i + 1));
-			signals.add(neurons.get(i).output());
+			result[i] = neurons.get(i).output();
 		}
 
-		return signals;
+		return result;
 	}
 
 	public void teach() {
+
 		for (int i = 0; i < neurons.size(); i++) {
-			neurons.get(i).teach();
+			double error = 0d;
+			for (int j = 0; j < nextLayer.getNeurons().size(); j++) {
+				if (bias) {
+					error += nextLayer.getNeurons().get(j).getDelta()
+							* nextLayer.getNeurons().get(j).getWeights()[i + 1];
+				} else {
+					error += nextLayer.getNeurons().get(j).getDelta()
+							* nextLayer.getNeurons().get(j).getWeights()[i];
+				}
+			}
+			neurons.get(i).setDelta(
+					error
+							* neurons.get(i).getActivateFunction()
+									.derivative(neurons.get(i).getResult()));
+		}
+	}
+	
+	public void updateWeights() {
+		for(Neuron neuron : neurons) {
+			neuron.teach();
 		}
 	}
 }

@@ -1,7 +1,5 @@
 package com.floreks;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -13,145 +11,121 @@ public class Neuron {
 	private static final String CLASSNAME = Neuron.class.getName();
 	private static final Logger LOGGER = Logger.getLogger(CLASSNAME);
 
-	private static double ALPHA = 0.6;
-	private double delta;
-	private List<Double> weights = new ArrayList<Double>();
-	private List<Double> signals = new ArrayList<Double>();
+	private static double ALPHA = 0.1;
+	private static double MOMENTUM = 0.9;
+
+	private double[] weights;
+	private double[] signals;
 	private Function activateFunction;
-	private Boolean biasEnabled = false;
-	private Boolean lastLayer = false;
-	private double expectedOutput;
-	private double bias;
+	private double delta = 0.0;
+	private double out;
+	private boolean bias;
 
-	public Neuron(Integer inputSize) {
-		LOGGER.debug("Creating neuron - Input size: " + inputSize);
+	public Neuron(int inputSize, Function function) {
 
-		for (int i = 0; i < inputSize; i++) {
-			weights.add(0.0);
-			signals.add(0.0);
-		}
+		weights = new double[inputSize];
+		signals = new double[inputSize];
+		activateFunction = function;
 
 	}
-
-	public Neuron(Integer inputSize, Function function) {
-		LOGGER.debug("Creating neuron - Input size: " + inputSize);
-
-		for (int i = 0; i < inputSize; i++) {
-			weights.add(0.0);
-			signals.add(0.0);
-		}
-
-		this.activateFunction = function;
+	
+	public double getResult() {
+		return out;
 	}
 
-	public void enableBias(Boolean bool) {
-
-		biasEnabled = bool;
-	}
-
-	public Boolean isBiasEnabled() {
-		return biasEnabled;
-	}
-
-	public void setExpectedOutput(double output) {
-		lastLayer = true;
-		this.expectedOutput = output;
-	}
-
-	public double getExpectedOutput() {
-		return expectedOutput;
-	}
-
-	public List<Double> getWeights() {
-		return weights;
+	public void setDelta(double delta) {
+		this.delta = delta;
 	}
 
 	public double getDelta() {
 		return delta;
 	}
 
+	public Neuron(int inputSize) {
+
+		weights = new double[inputSize];
+		signals = new double[inputSize];
+	}
+
 	public static void setAlpha(double alpha) {
 		Neuron.ALPHA = alpha;
 	}
 
-	public static double getAlpha(double alpha) {
-		return alpha;
+	public static void setMomentum(double momentum) {
+		Neuron.MOMENTUM = momentum;
+	}
+
+	public void setBiasEnabled(boolean bool) {
+
+		if (bool == true) {
+			weights = signals = new double[weights.length + 1];
+			signals[0] = 1d;
+			bias = bool;
+		}
 	}
 
 	public void setActivateFunction(Function function) {
-		LOGGER.debug("Activate function - " + function);
 		this.activateFunction = function;
 	}
 
-	public void initWeights(double minRange, double maxRange) {
+	public Function getActivateFunction() {
+		return activateFunction;
+	}
+
+	public double[] getWeights() {
+		return weights;
+	}
+
+	public double[] getSignals() {
+		return signals;
+	}
+
+	public void initWeights(double lowerBound, double upperBound) {
 		Random random = new Random();
 
-		LOGGER.debug("Initializing weights, size: " + weights.size());
-		for (int i = 0; i < weights.size(); i++) {
-			weights.set(i,
-					minRange + (maxRange - minRange) * random.nextDouble());
+		for (int i = 0; i < weights.length; i++) {
+			weights[i] = lowerBound + (upperBound - lowerBound)
+					* random.nextDouble();
+			LOGGER.info("Weight: " + weights[i]);
+		}
+	}
+
+	public void setSignals(double[] signals) {
+		if(bias) {
+			this.signals = new double[signals.length + 1];
+			this.signals[0] = 1.0;
+			for(int i=0;i<signals.length;i++) {
+				this.signals[i+1] = signals[i];
+			}
+		} else {
+			this.signals = signals.clone();
 		}
 
-		bias = minRange + (maxRange - minRange) * random.nextDouble();
-	}
-
-	public void initWeights(List<Double> weights) {
-		this.weights = new ArrayList<Double>(weights);
-	}
-
-	public void initSignals(List<Double> signals) {
-		LOGGER.debug("Initializing signals");
-		this.signals = new ArrayList<Double>(signals);
-
+		for (int i = 0; i < signals.length; i++) {
+			LOGGER.info("Signal " + i + ": " + signals[i]);
+		}
 	}
 
 	public double output() {
 
-		double neuronOutput = 0.0;
+		double result = 0.0;
 
-		for (int i = 0; i < weights.size(); i++) {
-			LOGGER.info("Weight " + (i + 1) + ": " + weights.get(i));
-			LOGGER.info("Signal " + (i + 1) + ": " + signals.get(i));
-			neuronOutput += signals.get(i) * weights.get(i);
+		for (int i = 0; i < weights.length; i++) {
+			result += weights[i] * signals[i];
 		}
+		
+		out = result;
 
-		if (biasEnabled) {
-			neuronOutput += bias;
-		}
+		return activateFunction.value(result);
 
-		LOGGER.info("Neuron output: " + activateFunction.value(neuronOutput));
-		return activateFunction.value(neuronOutput);
-	}
-
-	public double countError(double delta) {
-		if (lastLayer) {
-			this.delta = (expectedOutput - output())
-					* activateFunction.derivative(output());
-			LOGGER.info("Expected out: " + expectedOutput);
-			LOGGER.info("Delta: " + this.delta);
-			return (expectedOutput - output())
-					* activateFunction.derivative(output());
-		} else {
-			this.delta = delta * activateFunction.derivative(output());
-			LOGGER.info("Expected out: " + expectedOutput);
-			LOGGER.info("Delta: " + this.delta);
-			return delta * activateFunction.derivative(output());
-		}
 	}
 
 	public void teach() {
 
-		double result = output();
-		double deltaWeight = ALPHA * delta
-				* activateFunction.derivative(result);
-		;
-		for (int i = 0; i < weights.size(); i++) {
-			weights.set(i, weights.get(i) + (deltaWeight * signals.get(i)));
-		}
-
-		if (biasEnabled) {
-			bias += deltaWeight;
+		double [] weightsCopy = weights.clone();
+		for (int i = 0; i < weights.length; i++) {
+			weights[i] -= delta * 2 * ALPHA * signals[i];
+			weights[i] -= MOMENTUM * (weights[i] - weightsCopy[i]);
 		}
 	}
-
 }
