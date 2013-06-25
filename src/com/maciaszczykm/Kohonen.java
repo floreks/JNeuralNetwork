@@ -10,7 +10,7 @@ import java.util.List;
 import com.floreks.Neuron;
 import com.floreks.functions.TestFunction;
 
-public class NeuralGas {
+public class Kohonen {
 
 	private static List<Neuron> neurons = new ArrayList<Neuron>();
 	private static List<Neuron> pattern = new ArrayList<Neuron>();
@@ -24,7 +24,7 @@ public class NeuralGas {
 	private double learnFactor = learnFactorMax;
 	private double epochsCounter = 20;
 
-	public NeuralGas(String patternDataPath, int neuronCounter, double lambdaMin, double learnFactorMax, double learnFactorMin, double epochsCounter) throws IOException {
+	public Kohonen(String patternDataPath, int neuronCounter, double lambdaMin, double learnFactorMax, double learnFactorMin, double epochsCounter) throws IOException {
 		//setting variables
 		this.neuronCounter = neuronCounter;
 		this.lambdaMax = this.neuronCounter/2;
@@ -58,26 +58,34 @@ public class NeuralGas {
 	}
 
 	public void process() {
+		double distance = 0;
 		for(int i=0; i<epochsCounter; i++) {
 			lambda = lambdaMax * Math.pow(lambdaMin/lambdaMax,(double)i/epochsCounter);
 			for(int j=0; j<pattern.size(); j++) {
-				//sorting neurons
 				Collections.sort(neurons,new NeuronComparator(pattern.get(j)));
-				//updating neurons weights and learn factor
-				for(int k=0; k<neurons.size(); k++) {
-					learnFactor = learnFactorMax*Math.pow(learnFactorMin/learnFactorMax,i/epochsCounter);
-					double[] weights = neurons.get(k).getWeights();
-					for(int l=0; l<weights.length; l++) {
-						weights[l] = weights[l] + (learnFactor * Math.exp((double)-k/lambda) * (pattern.get(j).getWeights()[l] - neurons.get(k).getWeights()[l]));
-					}
-					neurons.get(k).setWeights(weights);
-				}
+				//updating winner
+				distance = NeuronComparator.countDistance(neurons.get(0),pattern.get(j));
+				
+				
+//				neurons[0].w0 += e * exp(-(distance*distance)/(2.0*lambda*lambda)) * (datax[w]-neurons[0].w0);
+//	            neurons[0].w1 += e * exp(-(distance*distance)/(2.0*lambda*lambda)) * (datay[w]-neurons[0].w1);
+//				
+//				 distance = countDistance(neurons[0],datax[w],datay[w]);
+//				
+//				for(int k=0; k<neurons.size(); k++) {
+//					learnFactor = learnFactorMax*Math.pow(learnFactorMin/learnFactorMax,i/epochsCounter);
+//					double[] weights = neurons.get(k).getWeights();
+//					for(int l=0; l<weights.length; l++) {
+//						weights[l] = weights[l] + (learnFactor * Math.exp((double)-k/lambda) * (pattern.get(j).getWeights()[l] - neurons.get(k).getWeights()[l]));
+//					}
+//					neurons.get(k).setWeights(weights);
+//				}
 			}
 		}
 	}
 	
 	public void plot() {
-		Plot.plot("Neural Gas", neurons, pattern);
+		Plot.plot("Kohonen", neurons, pattern);
 	}
 	
 	public List<Neuron> getNeurons() {
@@ -85,9 +93,9 @@ public class NeuralGas {
 	}
 
 	public static void main(String[] args) throws IOException {
-		NeuralGas ng = new NeuralGas("resource/pattern.dat",100,0.01,0.4,0.004,20);
-		ng.process();
-		ng.plot();
+		Kohonen k = new Kohonen("resource/pattern.dat",100,0.01,0.4,0.004,20);
+		k.process();
+		k.plot();
 	}
 
 }
