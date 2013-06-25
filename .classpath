@@ -2,15 +2,15 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="G:/Biblioteki/Windchill/ie3rdpartylibs.jar"/>
-	<classpathentry kind="lib" path="C:/Users/GiBSoN/Desktop/jfreechart-1.0.14/jfreechart-1.0.14/lib/gnujaxp.jar"/>
-	<classpathentry kind="lib" path="C:/Users/GiBSoN/Desktop/jfreechart-1.0.14/jfreechart-1.0.14/lib/iText-2.1.5.jar"/>
-	<classpathentry kind="lib" path="C:/Users/GiBSoN/Desktop/jfreechart-1.0.14/jfreechart-1.0.14/lib/jcommon-1.0.17.jar"/>
-	<classpathentry kind="lib" path="C:/Users/GiBSoN/Desktop/jfreechart-1.0.14/jfreechart-1.0.14/lib/jfreechart-1.0.14.jar"/>
-	<classpathentry kind="lib" path="C:/Users/GiBSoN/Desktop/jfreechart-1.0.14/jfreechart-1.0.14/lib/jfreechart-1.0.14-experimental.jar"/>
-	<classpathentry kind="lib" path="C:/Users/GiBSoN/Desktop/jfreechart-1.0.14/jfreechart-1.0.14/lib/jfreechart-1.0.14-swt.jar"/>
-	<classpathentry kind="lib" path="C:/Users/GiBSoN/Desktop/jfreechart-1.0.14/jfreechart-1.0.14/lib/junit.jar"/>
-	<classpathentry kind="lib" path="C:/Users/GiBSoN/Desktop/jfreechart-1.0.14/jfreechart-1.0.14/lib/servlet.jar"/>
-	<classpathentry kind="lib" path="C:/Users/GiBSoN/Desktop/jfreechart-1.0.14/jfreechart-1.0.14/lib/swtgraphics2d.jar"/>
+	<classpathentry kind="lib" path="C:/jfreechart-1.0.14/lib/gnujaxp.jar"/>
+	<classpathentry kind="lib" path="C:/jfreechart-1.0.14/lib/iText-2.1.5.jar"/>
+	<classpathentry kind="lib" path="C:/jfreechart-1.0.14/lib/jcommon-1.0.17.jar"/>
+	<classpathentry kind="lib" path="C:/jfreechart-1.0.14/lib/jfreechart-1.0.14.jar"/>
+	<classpathentry kind="lib" path="C:/jfreechart-1.0.14/lib/jfreechart-1.0.14-experimental.jar"/>
+	<classpathentry kind="lib" path="C:/jfreechart-1.0.14/lib/jfreechart-1.0.14-swt.jar"/>
+	<classpathentry kind="lib" path="C:/jfreechart-1.0.14/lib/junit.jar"/>
+	<classpathentry kind="lib" path="C:/jfreechart-1.0.14/lib/servlet.jar"/>
+	<classpathentry kind="lib" path="C:/jfreechart-1.0.14/lib/swtgraphics2d.jar"/>
+	<classpathentry kind="lib" path="C:/apache-log4j-1.2.17/log4j-1.2.17.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

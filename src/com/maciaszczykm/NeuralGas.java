@@ -60,12 +60,12 @@ public class NeuralGas {
 	public void process() {
 		for(int i=0; i<epochsCounter; i++) {
 			lambda = lambdaMax * Math.pow(lambdaMin/lambdaMax,(double)i/epochsCounter);
+			learnFactor = learnFactorMax*Math.pow(learnFactorMin/learnFactorMax,i/epochsCounter);
 			for(int j=0; j<pattern.size(); j++) {
 				//sorting neurons
 				Collections.sort(neurons,new NeuronComparator(pattern.get(j)));
 				//updating neurons weights and learn factor
 				for(int k=0; k<neurons.size(); k++) {
-					learnFactor = learnFactorMax*Math.pow(learnFactorMin/learnFactorMax,i/epochsCounter);
 					double[] weights = neurons.get(k).getWeights();
 					for(int l=0; l<weights.length; l++) {
 						weights[l] = weights[l] + (learnFactor * Math.exp((double)-k/lambda) * (pattern.get(j).getWeights()[l] - neurons.get(k).getWeights()[l]));
