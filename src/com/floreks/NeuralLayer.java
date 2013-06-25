@@ -53,10 +53,7 @@ public class NeuralLayer {
 	}
 
 	public void initSignals(double[] signals) {
-		for (int i = 0; i < signals.length; i++) {
-			LOGGER.debug("Neuron " + (i + 1));
-			neurons.get(i).setSignals(new double[] { signals[i] });
-		}
+		neurons.get(0).setSignals(signals);
 	}
 
 	public void setBiasEnabled(boolean bool) {

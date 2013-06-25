@@ -14,7 +14,7 @@ import org.jfree.ui.RefineryUtilities;
 import com.floreks.Neuron;
 
 public class Plot extends ApplicationFrame {
-
+	
 	private static final long serialVersionUID = -7875653229675786674L;
 
 	public Plot(final String title, List<Neuron> neurons, List<Neuron> pattern) {
@@ -42,5 +42,5 @@ public class Plot extends ApplicationFrame {
 		RefineryUtilities.centerFrameOnScreen(plot);
 		plot.setVisible(true);
 	}
-
+	
 }

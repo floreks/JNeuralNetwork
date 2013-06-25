@@ -11,47 +11,48 @@ import java.util.List;
 import com.floreks.Neuron;
 import com.floreks.functions.TestFunction;
 
-public class Kohonen {
+public class Kohonen implements SOM{
 
-	private static List<Neuron> neurons = new ArrayList<Neuron>();
-	private static List<Neuron> pattern = new ArrayList<Neuron>();
+	private List<Neuron> neurons = new ArrayList<Neuron>();
+	private List<Neuron> pattern = new ArrayList<Neuron>();
 
-	@SuppressWarnings("unused")
 	private int neuronCounter = 100;
 	private double lambda = 0.05;
 	private double learnFactor = 0.4;
 	private double epochsCounter = 20;
 
-	public Kohonen(String patternDataPath, int neuronCounter, double lambda, double learnFactor, double epochsCounter) throws IOException {
-		//setting variables
+	public Kohonen(int neuronCounter) throws IOException {
 		this.neuronCounter = neuronCounter;
-		this.lambda = lambda;
-		this.learnFactor = learnFactor;
-		this.epochsCounter = epochsCounter;
-		//initializing neurons
-		initNeurons(neuronCounter);
-		//loading pattern data
-		loadPatternData(patternDataPath);
 	}
 
-	private static void initNeurons(int counter) {
-		for(int i=0; i<counter; i++) {
-			//neurons initialized with x and y between 0 and 1
-			neurons.add(new Neuron(new TestFunction(), Math.random(), Math.random()));
+	private void initNeurons(int counter, int size) {
+		double []weights = new double[size];
+		for (int i = 0; i < counter; i++) {
+			for(int j=0;j<size;j++) {
+				weights[j] = Math.random();
+			}
+			neurons.add(new Neuron(new TestFunction(), weights.clone()));
 		}
 	}
 
 	@SuppressWarnings("resource")
-	private static void loadPatternData(String path) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader(new File(path)));
+	public void loadPatternData(String path) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(
+				new File(path)));
 		String line = null;
-		while((line = reader.readLine()) != null) {
+		while ((line = reader.readLine()) != null) {
 			String[] doubles = line.split(" ");
-			pattern.add(new Neuron(new TestFunction(), Double.parseDouble(doubles[0]),Double.parseDouble(doubles[1])));
+			double []w = new double[doubles.length];
+			for(int i=0;i<w.length;i++) {
+				w[i] = Double.parseDouble(doubles[i]);
+			}
+			pattern.add(new Neuron(new TestFunction(), w.clone()));
 		}
 	}
 
-	public void process() {
+	public void teach(int epochs) {
+		this.epochsCounter = epochs;
+		initNeurons(neuronCounter,pattern.get(0).getWeights().length);
 		double distance = 0;
 		for(int i=0; i<epochsCounter; i++) {
 			for(int j=0; j<pattern.size(); j++) {
@@ -82,11 +83,9 @@ public class Kohonen {
 	public List<Neuron> getNeurons() {
 		return neurons;
 	}
-
-	public static void main(String[] args) throws IOException {
-		Kohonen k = new Kohonen("resource/pattern.dat",100,0.05,0.4,20);
-		k.process();
-		k.plot();
+	
+	public void setPattern(List<Neuron> pattern) {
+		this.pattern = pattern;
 	}
 
 }
